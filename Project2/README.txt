@@ -1,5 +1,5 @@
 Mitchell Binning, Erick Ruiz
-UID: 003990970, #########
+UID: 003990970, 303913013
 
 Part B: Design your relational schema
 
