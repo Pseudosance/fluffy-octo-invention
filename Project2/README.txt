@@ -5,7 +5,7 @@ Part B: Design your relational schema
 
 1) Relations:
 
-    Items(ItemID, Name, Currently, BuyPrice, FirstBid, NumberOfBids, ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)
+    Items(ItemID, Name, Currently, BuyPrice, First_Bid, Number_of_Bids, ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)
         Primary Key: ItemID
         Foreign Key: UserID_Seller
         Note: If the ItemLocation, ItemLatitude, ItemLongitude, ItemCountry are always the same for the user (i.e. a user doesn't sell items in different locations) it may be useful to put this info in the User table.

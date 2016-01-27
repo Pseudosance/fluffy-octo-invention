@@ -189,21 +189,86 @@ class MyParser {
         Element source = doc.getDocumentElement();
         Element[] items = getElementsByTagNameNR(source, "Item");
         Element item = items[0];
-        
-        //grab all the items
-        for(int i=0; i < 1; i++){
-            item = items[i];
 
-            String text = item.getAttribute("ItemID");
-            System.out.println("ItemID" + ' ' + text);
 
-            text = getElementTextByTagNameNR(item, "Name");
-            System.out.println("Name" + ' ' + text);
+        try
+        {
+            PrintWriter writer = new PrintWriter("items.csv", "UTF-8");
+            
+            /*
+            
+            Users(UserID, SellerRating, BidderRating, BidderLocation, BidderCountry)
+            
+            Bids(ItemID, UserID_Bidder, Time, Amount)
+             
+            Categories(ItemID, Category)       */
 
-            text = getElementTextByTagNameNR(item, "Currently");
-            System.out.println("Currently" + ' ' + text);
+            //grab all the items
+            for(int i=0; i < items.length-1; i++){
+                item = items[i];
+
+                //
+                //  Items table
+                // 
+                //  Items(ItemID, Name, Currently, BuyPrice, First_Bid, Number_of_Bids, 
+                //      ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)  
+                //
+                String text = item.getAttribute("ItemID");
+                writer.printf(text);
+
+                text = getElementTextByTagNameNR(item, "Name");
+                text = text.replace("%","%%");
+                writer.printf(", " + "\"" + text + "\"");
+
+                text = getElementTextByTagNameNR(item, "Currently");
+                writer.printf(", " + strip(text));
+
+                text = getElementTextByTagNameNR(item, "BuyPrice");
+                writer.printf(", " + strip(text));
+
+                text = getElementTextByTagNameNR(item, "First_Bid");
+                writer.printf(", " + strip(text));
+
+                text = getElementTextByTagNameNR(item, "Number_of_Bids");
+                writer.printf(", " + text);
+
+                String longitude="", latitude="";
+                text = getElementTextByTagNameNR(item, "Location");
+                latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");
+                longitude = getElementByTagNameNR(item, "Location").getAttribute("Longitude");
+                writer.printf(", " + "\"" + text + "\"" + ", " + latitude + ", " + longitude);
+
+                text = getElementTextByTagNameNR(item, "Country");
+                writer.printf(", " + "\"" + text + "\"");
+
+                text = getElementTextByTagNameNR(item, "Started");
+                writer.printf(", " + text);
+
+                text = getElementTextByTagNameNR(item, "Ends");
+                writer.printf(", " + text);
+
+                text = getElementByTagNameNR(item, "Seller").getAttribute("UserID");
+                writer.printf(", " + "\"" + text + "\"");
+
+                text = getElementTextByTagNameNR(item, "Description");
+                text = text.substring(0, Math.min(text.length(), 4000));
+                text = text.replace("%","%%");
+                writer.printf(", " + "\"" + text + "\"\n");
+
+                Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(item, "Bids"), "Bid");
+                //finish off getting info for bids
+            }
+
+            writer.close();
         }
-        
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch(UnsupportedEncodingException u)
+        {
+            u.printStackTrace();
+        }
     }
     
     public static void main (String[] args) {
