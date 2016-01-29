@@ -194,17 +194,10 @@ class MyParser {
         try
         {
             PrintWriter w_items = new PrintWriter("Items.dat", "UTF-8");
-            PrintWriter w_users = new PrintWriter("Users.dat", "UTF-8");
+            PrintWriter w_sellers = new PrintWriter("Sellers.dat", "UTF-8");
+            PrintWriter w_bidders = new PrintWriter("Bidders.dat", "UTF-8");
             PrintWriter w_bids = new PrintWriter("Bids.dat", "UTF-8");
             PrintWriter w_cats = new PrintWriter("Categories.dat", "UTF-8");
-            
-            /*
-            
-            Users(UserID, SellerRating, BidderRating, BidderLocation, BidderCountry)
-            
-            Bids(ItemID, UserID_Bidder, Time, Amount)
-             
-                   */
 
             //grab all the items
             for(int i=0; i < items.length-1; i++){
@@ -217,7 +210,7 @@ class MyParser {
                 //      ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)  
                 //
                 String itemID = item.getAttribute("ItemID");
-                w_items.printf("\"" + text + "\"");
+                w_items.printf("\"" + itemID + "\"");
 
                 String text = getElementTextByTagNameNR(item, "Name");
                 text = text.replace("%","%%");
@@ -252,7 +245,13 @@ class MyParser {
                 text = getElementTextByTagNameNR(item, "Ends");
                 w_items.printf("," + text);
 
+                //
+                //  Sellers(UserID, SellerRating)
+                //
+
                 text = getElementByTagNameNR(item, "Seller").getAttribute("UserID");
+                String rating = getElementByTagNameNR(item, "Seller").getAttribute("Rating");
+                w_sellers.printf("\"" + text + "\"," + "\"" + rating + "\"\n" );
                 w_items.printf(","  + text );
 
                 text = getElementTextByTagNameNR(item, "Description");
@@ -266,13 +265,41 @@ class MyParser {
                 // Categories(ItemID, Category)
                 //
                 Element[] cats = getElementsByTagNameNR(item, "Category");
+                for(int c=0; c<cats.length; c++){
+                    Element cat = cats[c];
+                    String cattext = getElementText(cat);
+                    w_cats.printf("\"" + itemID + "\"," + "\"" +  cattext + "\"\n");
+
+                }
 
                 Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(item, "Bids"), "Bid");
-                //finish off getting info for bids
+                for(int b=0; b<bids.length; b++){
+                    Element bid = bids[b];
+                    
+                    //
+                    //  Bidders(UserID, BidderRating, BidderLocation, BidderCountry);
+                    //
+                    Element bidder = getElementByTagNameNR(bid, "Bidder");
+                    String userID = bidder.getAttribute("UserID");
+                    rating = bidder.getAttribute("Rating");
+                    String loc = getElementTextByTagNameNR(bidder, "Location");
+                    String ctry = getElementTextByTagNameNR(bidder, "Country");
+
+                    w_bidders.printf("\"" + userID + "\",\"" + rating + "\",\"" + loc + "\",\"" + ctry + "\"\n");
+
+                    //
+                    //  Bids(ItemID, UserID_Bidder, Time, Amount)
+                    //
+
+                    String time = getElementTextByTagNameNR(bid, "Time");
+                    String amount = getElementTextByTagNameNR(bid, "Amount");
+                    w_bids.printf("\"" + itemID + "\",\"" + userID + "\",\"" + time + "\",\"" + strip(amount) + "\"\n");
+                }
             }
 
             w_items.close();
-            w_users.close();
+            w_sellers.close();
+            w_bidders.close();
             w_bids.close();
             w_cats.close();
         }
