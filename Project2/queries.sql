@@ -1,6 +1,8 @@
 -- 1) Find number of users in the database
-SELECT Count(*)
-FROM Users;
+SELECT Count(Distinct UserID)
+FROM (SELECT UserID 
+      FROM Sellers)     UNION   (SELECT UserID
+                                    FROM Bidders)
 
 -- 2) Find the number of items in "New York"
 SELECT Count(*)
@@ -42,13 +44,13 @@ WHERE Currently = (SELECT MAX(Currently)
 		
 -- 5) Number of sellers whose rating is higher than 1000
 SELECT COUNT(*)
-FROM Users
-WHERE Users.SellerRating > 1000;
+FROM Sellers
+WHERE SellerRating > 1000;
 
 -- 6) Number of users who are both sellers and bidders
 SELECT COUNT(*)
-FROM Users
-WHERE Users.SellerRating IS NOT NULL AND Users.BidderRating IS NOT NULL;
+FROM Sellers, Bidders
+WHERE Sellers.UserID = Bidders.UserID;
 
 -- 7) Number of categories that include at least one item with a bid of more than $100
 SELECT COUNT(DISTINCT Category)

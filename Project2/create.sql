@@ -1,7 +1,16 @@
-CREATE TABLE Users(
-	UserID VARCHAR(50), SellerRating INT, BidderRating INT, BidderLocation VARCHAR(50), BidderCountry VARCHAR(30),  
-	PRIMARY KEY(UserID)
-	); 
+CREATE TABLE Sellers (
+	UserID VARCHAR(50), 
+	SellerRating INT,
+    PRIMARY KEY(UserID)
+);
+    
+CREATE TABLE Bidders (
+	UserID VARCHAR(50),
+	BidderRating INT,
+	BidderLocation VARCHAR(50), 
+	BidderCountry VARCHAR(30),
+    PRIMARY KEY(UserID)
+);
 
 CREATE TABLE Items(
 	ItemID INT, Name VARCHAR(100), Currently DECIMAL(8,2), BuyPrice DECIMAL(8,2), FirstBid DECIMAL(8,2), NumberOfBids INT, ItemLocation VARCHAR(100), ItemLatitude FLOAT(10,6), ItemLongitude FLOAT(10,6), ItemCountry VARCHAR(30), Started TIMESTAMP, Ends TIMESTAMP, UserID_Seller VARCHAR(50), Description VARCHAR(4000), 
