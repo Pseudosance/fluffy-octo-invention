@@ -193,7 +193,7 @@ class MyParser {
 
         try
         {
-            PrintWriter writer = new PrintWriter("items.csv", "UTF-8");
+            PrintWriter writer = new PrintWriter("Items.dat", "UTF-8");
             
             /*
             
@@ -214,11 +214,11 @@ class MyParser {
                 //      ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)  
                 //
                 String text = item.getAttribute("ItemID");
-                writer.printf(text);
+                writer.printf("\"" + text + "\"");
 
                 text = getElementTextByTagNameNR(item, "Name");
                 text = text.replace("%","%%");
-                writer.printf(", " + "\"" + text + "\"");
+                writer.printf(", \"" + text + "\"");
 
                 text = getElementTextByTagNameNR(item, "Currently");
                 writer.printf(", " + strip(text));
@@ -234,12 +234,14 @@ class MyParser {
 
                 String longitude="", latitude="";
                 text = getElementTextByTagNameNR(item, "Location");
+                text = text.replace("%","%%");
                 latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");
                 longitude = getElementByTagNameNR(item, "Location").getAttribute("Longitude");
-                writer.printf(", " + "\"" + text + "\"" + ", " + latitude + ", " + longitude);
+                writer.printf(", \"" +  text  + "\", " + latitude + ", " + longitude);
 
                 text = getElementTextByTagNameNR(item, "Country");
-                writer.printf(", " + "\"" + text + "\"");
+                text = text.replace("%","%%");
+                writer.printf(", \""  + text + "\"");
 
                 text = getElementTextByTagNameNR(item, "Started");
                 writer.printf(", " + text);
@@ -248,12 +250,12 @@ class MyParser {
                 writer.printf(", " + text);
 
                 text = getElementByTagNameNR(item, "Seller").getAttribute("UserID");
-                writer.printf(", " + "\"" + text + "\"");
+                writer.printf(", "  + text );
 
                 text = getElementTextByTagNameNR(item, "Description");
                 text = text.substring(0, Math.min(text.length(), 4000));
                 text = text.replace("%","%%");
-                writer.printf(", " + "\"" + text + "\"\n");
+                writer.printf(", \""  + text + "\"\n");
 
                 Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(item, "Bids"), "Bid");
                 //finish off getting info for bids
