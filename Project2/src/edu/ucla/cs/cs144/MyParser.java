@@ -193,7 +193,10 @@ class MyParser {
 
         try
         {
-            PrintWriter writer = new PrintWriter("Items.dat", "UTF-8");
+            PrintWriter w_items = new PrintWriter("Items.dat", "UTF-8");
+            PrintWriter w_users = new PrintWriter("Users.dat", "UTF-8");
+            PrintWriter w_bids = new PrintWriter("Bids.dat", "UTF-8");
+            PrintWriter w_cats = new PrintWriter("Categories.dat", "UTF-8");
             
             /*
             
@@ -201,7 +204,7 @@ class MyParser {
             
             Bids(ItemID, UserID_Bidder, Time, Amount)
              
-            Categories(ItemID, Category)       */
+                   */
 
             //grab all the items
             for(int i=0; i < items.length-1; i++){
@@ -213,55 +216,65 @@ class MyParser {
                 //  Items(ItemID, Name, Currently, BuyPrice, First_Bid, Number_of_Bids, 
                 //      ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)  
                 //
-                String text = item.getAttribute("ItemID");
-                writer.printf("\"" + text + "\"");
+                String itemID = item.getAttribute("ItemID");
+                w_items.printf("\"" + text + "\"");
 
-                text = getElementTextByTagNameNR(item, "Name");
+                String text = getElementTextByTagNameNR(item, "Name");
                 text = text.replace("%","%%");
-                writer.printf(", \"" + text + "\"");
+                w_items.printf(",\"" + text + "\"");
 
                 text = getElementTextByTagNameNR(item, "Currently");
-                writer.printf(", " + strip(text));
+                w_items.printf("," + strip(text));
 
                 text = getElementTextByTagNameNR(item, "BuyPrice");
-                writer.printf(", " + strip(text));
+                w_items.printf("," + strip(text));
 
                 text = getElementTextByTagNameNR(item, "First_Bid");
-                writer.printf(", " + strip(text));
+                w_items.printf("," + strip(text));
 
                 text = getElementTextByTagNameNR(item, "Number_of_Bids");
-                writer.printf(", " + text);
+                w_items.printf("," + text);
 
                 String longitude="", latitude="";
                 text = getElementTextByTagNameNR(item, "Location");
                 text = text.replace("%","%%");
                 latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");
                 longitude = getElementByTagNameNR(item, "Location").getAttribute("Longitude");
-                writer.printf(", \"" +  text  + "\", " + latitude + ", " + longitude);
+                w_items.printf(",\"" +  text  + "\"," + latitude + "," + longitude);
 
                 text = getElementTextByTagNameNR(item, "Country");
                 text = text.replace("%","%%");
-                writer.printf(", \""  + text + "\"");
+                w_items.printf(",\""  + text + "\"");
 
                 text = getElementTextByTagNameNR(item, "Started");
-                writer.printf(", " + text);
+                w_items.printf("," + text);
 
                 text = getElementTextByTagNameNR(item, "Ends");
-                writer.printf(", " + text);
+                w_items.printf("," + text);
 
                 text = getElementByTagNameNR(item, "Seller").getAttribute("UserID");
-                writer.printf(", "  + text );
+                w_items.printf(","  + text );
 
                 text = getElementTextByTagNameNR(item, "Description");
                 text = text.substring(0, Math.min(text.length(), 4000));
                 text = text.replace("%","%%");
-                writer.printf(", \""  + text + "\"\n");
+                w_items.printf(",\""  + text + "\"\n");
+
+                //
+                // Categories Table
+                // 
+                // Categories(ItemID, Category)
+                //
+                Element[] cats = getElementsByTagNameNR(item, "Category");
 
                 Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(item, "Bids"), "Bid");
                 //finish off getting info for bids
             }
 
-            writer.close();
+            w_items.close();
+            w_users.close();
+            w_bids.close();
+            w_cats.close();
         }
         catch (FileNotFoundException e)
         {
