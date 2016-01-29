@@ -217,13 +217,22 @@ class MyParser {
                 w_items.printf(",\"" + text + "\"");
 
                 text = getElementTextByTagNameNR(item, "Currently");
-                w_items.printf("," + strip(text));
+                text = strip(text);
+                if(text == "")
+                    text = "NULL";
+                w_items.printf("," + text);
 
                 text = getElementTextByTagNameNR(item, "BuyPrice");
-                w_items.printf("," + strip(text));
+                text = strip(text);
+                if(text == "")
+                    text = "NULL";
+                w_items.printf("," + text);
 
                 text = getElementTextByTagNameNR(item, "First_Bid");
-                w_items.printf("," + strip(text));
+                text = strip(text);
+                if(text == "")
+                    text = "NULL";
+                w_items.printf("," + text);
 
                 text = getElementTextByTagNameNR(item, "Number_of_Bids");
                 w_items.printf("," + text);
@@ -233,6 +242,11 @@ class MyParser {
                 text = text.replace("%","%%");
                 latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");
                 longitude = getElementByTagNameNR(item, "Location").getAttribute("Longitude");
+                if(latitude == "")
+                    latitude = "NULL";
+                if(longitude == "")
+                    longitude = "NULL";
+
                 w_items.printf(",\"" +  text  + "\"," + latitude + "," + longitude);
 
                 text = getElementTextByTagNameNR(item, "Country");
@@ -258,7 +272,7 @@ class MyParser {
                 text = getElementByTagNameNR(item, "Seller").getAttribute("UserID");
                 String rating = getElementByTagNameNR(item, "Seller").getAttribute("Rating");
                 w_sellers.printf("\"" + text + "\"," + "\"" + rating + "\"\n" );
-                w_items.printf(","  + text );
+                w_items.printf(",\""  + text + "\"");
 
                 text = getElementTextByTagNameNR(item, "Description");
                 text = text.substring(0, Math.min(text.length(), 4000));
