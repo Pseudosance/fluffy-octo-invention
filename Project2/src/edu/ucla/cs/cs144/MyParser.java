@@ -193,11 +193,12 @@ class MyParser {
 
         try
         {
-            PrintWriter w_items = new PrintWriter("Items.dat", "UTF-8");
-            PrintWriter w_sellers = new PrintWriter("Sellers.dat", "UTF-8");
-            PrintWriter w_bidders = new PrintWriter("Bidders.dat", "UTF-8");
-            PrintWriter w_bids = new PrintWriter("Bids.dat", "UTF-8");
-            PrintWriter w_cats = new PrintWriter("Categories.dat", "UTF-8");
+            
+            PrintWriter w_items = new PrintWriter(new OutputStreamWriter( new FileOutputStream(new File("Items.dat"), true),"UTF-8"));
+            PrintWriter w_sellers = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Sellers.dat"), true), "UTF-8"));
+            PrintWriter w_bidders = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Bidders.dat"), true), "UTF-8"));
+            PrintWriter w_bids = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Bids.dat"), true), "UTF-8"));
+            PrintWriter w_cats = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Categories.dat"), true), "UTF-8"));
 
             //grab all the items
             for(int i=0; i < items.length-1; i++){
@@ -301,11 +302,16 @@ class MyParser {
                     //
                     Element bidder = getElementByTagNameNR(bid, "Bidder");
                     String userID = bidder.getAttribute("UserID");
+                            userID = userID.replace("%","%%");
                     rating = bidder.getAttribute("Rating");
                     String loc = getElementTextByTagNameNR(bidder, "Location");
                     String ctry = getElementTextByTagNameNR(bidder, "Country");
 
-                    w_bidders.printf("\"" + userID + "\",\"" + rating + "\",\"" + loc + "\",\"" + ctry + "\"\n");
+                    System.out.println(userID);
+                    w_bidders.printf("\"" + userID + "\",\"" + 
+                                            rating + "\",\"" + 
+                                            "loc" + "\",\"" + 
+                                            ctry + "\"\n");
 
                     //
                     //  Bids(ItemID, UserID_Bidder, Time, Amount)
