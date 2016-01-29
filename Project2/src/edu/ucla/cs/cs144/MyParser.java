@@ -239,10 +239,16 @@ class MyParser {
                 text = text.replace("%","%%");
                 w_items.printf(",\""  + text + "\"");
 
+
+
                 text = getElementTextByTagNameNR(item, "Started");
-                w_items.printf("," + text);
+                Date date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(text);
+                String outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+                w_items.printf("," + outdate);
 
                 text = getElementTextByTagNameNR(item, "Ends");
+                date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(text);
+                outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
                 w_items.printf("," + text);
 
                 //
@@ -292,8 +298,10 @@ class MyParser {
                     //
 
                     String time = getElementTextByTagNameNR(bid, "Time");
+                    date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(time);
+                    outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
                     String amount = getElementTextByTagNameNR(bid, "Amount");
-                    w_bids.printf("\"" + itemID + "\",\"" + userID + "\",\"" + time + "\",\"" + strip(amount) + "\"\n");
+                    w_bids.printf("\"" + itemID + "\",\"" + userID + "\",\"" + outdate + "\",\"" + strip(amount) + "\"\n");
                 }
             }
 
@@ -310,6 +318,10 @@ class MyParser {
         catch(UnsupportedEncodingException u)
         {
             u.printStackTrace();
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
         }
     }
     
