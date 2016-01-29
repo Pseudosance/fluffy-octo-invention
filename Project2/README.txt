@@ -10,10 +10,12 @@ Part B: Design your relational schema
         Foreign Key: UserID_Seller
         Note: If the ItemLocation, ItemLatitude, ItemLongitude, ItemCountry are always the same for the user (i.e. a user doesn't sell items in different locations) it may be useful to put this info in the User table.
     
-    Users(UserID, SellerRating, BidderRating, BidderLocation, BidderCountry)
+    Sellers(UserID, SellerRating)
         Primary Key: UserID
-        Note: May be userful to split into a Seller table and Bidder table to avoid NULL values (i.e. someone who only sells will have a NULL BidderRating, BidderLocation, and BidderCountry. Someone who only bids will have a NULL SellerRating)
-        
+      
+    Bidders(UserID, BidderRating, BidderLocation, BidderCountry);
+  	Primary Key: UserID
+
     Bids(ItemID, UserID_Bidder, Time, Amount)
         Primary Key: ItemID, UserID_Bidder, Time 
         Foreign Keys: ItemID, UserID_Bidder
@@ -29,8 +31,11 @@ Part B: Design your relational schema
     Items:
         ItemID --> Name, Currently, BuyPrice, FirstBid, NumberOfBids, ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description
     
-    Users:
-        UserID --> SellerRating, BidderRating, BidderLocation, BidderCountry
+    Sellers:
+	UserID --> SellerRating
+
+    Bidders:
+        UserID --> BidderRating, BidderLocation, BidderCountry
         
     Bids:
         UserID_Bidder, Time --> ItemID, Amount   
