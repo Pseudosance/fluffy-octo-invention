@@ -201,8 +201,32 @@ class MyParser {
             PrintWriter w_cats = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Categories.dat"), true), "UTF-8"));
 
             //grab all the items
-            for(int i=0; i < items.length-1; i++){
+            for(int i=0; i < items.length; i++){
                 item = items[i];
+
+                String itemID = item.getAttribute("ItemID");
+                String name = getElementTextByTagNameNR(item, "Name").replaceAll("\"","'");
+                String currently = strip(getElementTextByTagNameNR(item, "Currently"));
+                String buyPrice = strip(getElementTextByTagNameNR(item, "BuyPrice"));
+                String firstBid = strip(getElementTextByTagNameNR(item, "First_Bid"));
+                String numOfBids = getElementTextByTagNameNR(item, "Number_of_Bids");
+                String latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");
+                String longitude = getElementByTagNameNR(item, "Location").getAttribute("Longitude");
+                String location = getElementTextByTagNameNR(item, "Location").replaceAll("\"","'");
+                String country = getElementTextByTagNameNR(item, "Country").replaceAll("\"","'");
+                String started = getElementTextByTagNameNR(item, "Started");
+                String ends = getElementTextByTagNameNR(item, "Ends");
+
+                Date date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(started);
+                String startedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+                date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(ends);
+                String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+
+                String userID_Seller = getElementByTagNameNR(item, "Seller").getAttribute("UserID").replaceAll("\"","'");
+                String description = getElementTextByTagNameNR(item, "Description").replaceAll("\"","'");
+                description = description.substring(0, Math.min(description.length(), 4000));
+                String rating = getElementByTagNameNR(item, "Seller").getAttribute("Rating");
+
 
                 //
                 //  Items table
@@ -210,75 +234,28 @@ class MyParser {
                 //  Items(ItemID, Name, Currently, BuyPrice, First_Bid, Number_of_Bids, 
                 //      ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)  
                 //
-                String itemID = item.getAttribute("ItemID");
-                w_items.printf("\"" + itemID + "\"");
 
-                String text = getElementTextByTagNameNR(item, "Name");
-                text = text.replace("%","%%");
-                w_items.printf(",\"" + text + "\"");
+                w_items.write("\"" + itemID + "\"");
+                w_items.write(",\"" + name + "\"");
+                w_items.write("," + currently);
+                w_items.write("," + buyPrice);
+                w_items.write("," + firstBid);
+                w_items.write("," + numOfBids);
+                w_items.write(",\"" +  location  + "\"," + latitude + "," + longitude);
+                w_items.write(",\""  + country + "\"");       
+                w_items.write("," + startedDate);               
+                w_items.write("," + endDate);
+                w_items.write(",\""  + userID_Seller + "\"");
+                w_items.write(",\""  + description + "\"\n");
 
-                text = getElementTextByTagNameNR(item, "Currently");
-                text = strip(text);
-                if(text == "")
-                    text = "NULL";
-                w_items.printf("," + text);
-
-                text = getElementTextByTagNameNR(item, "BuyPrice");
-                text = strip(text);
-                if(text == "")
-                    text = "NULL";
-                w_items.printf("," + text);
-
-                text = getElementTextByTagNameNR(item, "First_Bid");
-                text = strip(text);
-                if(text == "")
-                    text = "NULL";
-                w_items.printf("," + text);
-
-                text = getElementTextByTagNameNR(item, "Number_of_Bids");
-                w_items.printf("," + text);
-
-                String longitude="", latitude="";
-                text = getElementTextByTagNameNR(item, "Location");
-                text = text.replace("%","%%");
-                latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");
-                longitude = getElementByTagNameNR(item, "Location").getAttribute("Longitude");
-                if(latitude == "")
-                    latitude = "NULL";
-                if(longitude == "")
-                    longitude = "NULL";
-
-                w_items.printf(",\"" +  text  + "\"," + latitude + "," + longitude);
-
-                text = getElementTextByTagNameNR(item, "Country");
-                text = text.replace("%","%%");
-                w_items.printf(",\""  + text + "\"");
-
-
-
-                text = getElementTextByTagNameNR(item, "Started");
-                Date date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(text);
-                String outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-                w_items.printf("," + outdate);
-
-                text = getElementTextByTagNameNR(item, "Ends");
-                date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(text);
-                outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-                w_items.printf("," + text);
 
                 //
                 //  Sellers(UserID, SellerRating)
                 //
 
-                text = getElementByTagNameNR(item, "Seller").getAttribute("UserID");
-                String rating = getElementByTagNameNR(item, "Seller").getAttribute("Rating");
-                w_sellers.printf("\"" + text + "\"," + "\"" + rating + "\"\n" );
-                w_items.printf(",\""  + text + "\"");
-
-                text = getElementTextByTagNameNR(item, "Description");
-                text = text.substring(0, Math.min(text.length(), 4000));
-                text = text.replace("%","%%");
-                w_items.printf(",\""  + text + "\"\n");
+                
+                w_sellers.write("\"" + userID_Seller + "\"," + "\"" + rating + "\"\n" );
+                
 
                 //
                 // Categories Table
@@ -288,8 +265,8 @@ class MyParser {
                 Element[] cats = getElementsByTagNameNR(item, "Category");
                 for(int c=0; c<cats.length; c++){
                     Element cat = cats[c];
-                    String cattext = getElementText(cat);
-                    w_cats.printf("\"" + itemID + "\"," + "\"" +  cattext + "\"\n");
+                    String cattext = getElementText(cat).replaceAll("\"","'");
+                    w_cats.write("\"" + itemID + "\"," + "\"" +  cattext + "\"\n");
 
                 }
 
@@ -301,14 +278,14 @@ class MyParser {
                     //  Bidders(UserID, BidderRating, BidderLocation, BidderCountry);
                     //
                     Element bidder = getElementByTagNameNR(bid, "Bidder");
-                    String userID = bidder.getAttribute("UserID");
-                            userID = userID.replace("%","%%");
+                    String userID = bidder.getAttribute("UserID").replaceAll("\"","'");
+                            //userID = userID.replace("%","%%");
                     rating = bidder.getAttribute("Rating");
-                    String loc = getElementTextByTagNameNR(bidder, "Location");
-                    String ctry = getElementTextByTagNameNR(bidder, "Country");
+                    String loc = getElementTextByTagNameNR(bidder, "Location").replaceAll("\"","'");
+                    String ctry = getElementTextByTagNameNR(bidder, "Country").replaceAll("\"","'");
 
-                    System.out.println(userID);
-                    w_bidders.printf("\"" + userID + "\",\"" + 
+                    //System.out.println(userID);
+                    w_bidders.write("\"" + userID + "\",\"" + 
                                             rating + "\",\"" + 
                                             "loc" + "\",\"" + 
                                             ctry + "\"\n");
@@ -319,9 +296,9 @@ class MyParser {
 
                     String time = getElementTextByTagNameNR(bid, "Time");
                     date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(time);
-                    outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+                    String outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
                     String amount = getElementTextByTagNameNR(bid, "Amount");
-                    w_bids.printf("\"" + itemID + "\",\"" + userID + "\",\"" + outdate + "\",\"" + strip(amount) + "\"\n");
+                    w_bids.write("\"" + itemID + "\",\"" + userID + "\",\"" + outdate + "\",\"" + strip(amount) + "\"\n");
                 }
             }
 
