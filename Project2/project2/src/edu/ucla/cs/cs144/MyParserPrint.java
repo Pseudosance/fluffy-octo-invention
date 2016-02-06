@@ -41,7 +41,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
 
 
-class MyParser {
+class MyParserPrint {
     
     static final String columnSeparator = "|*|";
     static DocumentBuilder builder;
@@ -184,143 +184,35 @@ class MyParser {
             methods). */
         
         
-        
         /**************************************************************/
-        Element source = doc.getDocumentElement();
-        Element[] items = getElementsByTagNameNR(source, "Item");
-        Element item = items[0];
-
-
-        try
-        {
-            
-            PrintWriter w_items = new PrintWriter(new OutputStreamWriter( new FileOutputStream(new File("Items.dat"), true),"UTF-8"));
-            PrintWriter w_sellers = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Sellers.dat"), true), "UTF-8"));
-            PrintWriter w_bidders = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Bidders.dat"), true), "UTF-8"));
-            PrintWriter w_bids = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Bids.dat"), true), "UTF-8"));
-            PrintWriter w_cats = new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File("Categories.dat"), true), "UTF-8"));
-
-            //grab all the items
-            for(int i=0; i < items.length; i++){
-                item = items[i];
-
-                String itemID = item.getAttribute("ItemID");
-                String name = getElementTextByTagNameNR(item, "Name").replaceAll("\"","'");
-                String currently = strip(getElementTextByTagNameNR(item, "Currently"));
-                String buyPrice = strip(getElementTextByTagNameNR(item, "BuyPrice"));
-                String firstBid = strip(getElementTextByTagNameNR(item, "First_Bid"));
-                String numOfBids = getElementTextByTagNameNR(item, "Number_of_Bids");
-                String latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");
-                String longitude = getElementByTagNameNR(item, "Location").getAttribute("Longitude");
-                String location = getElementTextByTagNameNR(item, "Location").replaceAll("\"","'");
-                String country = getElementTextByTagNameNR(item, "Country").replaceAll("\"","'");
-                String started = getElementTextByTagNameNR(item, "Started");
-                String ends = getElementTextByTagNameNR(item, "Ends");
-
-                Date date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(started);
-                String startedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-                date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(ends);
-                String endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-
-                String userID_Seller = getElementByTagNameNR(item, "Seller").getAttribute("UserID").replaceAll("\"","'");
-                String description = getElementTextByTagNameNR(item, "Description").replaceAll("\"","'");
-                description = description.substring(0, Math.min(description.length(), 4000));
-                String rating = getElementByTagNameNR(item, "Seller").getAttribute("Rating");
-
-
-                //
-                //  Items table
-                // 
-                //  Items(ItemID, Name, Currently, BuyPrice, First_Bid, Number_of_Bids, 
-                //      ItemLocation, ItemLatitude, ItemLongitude, ItemCountry, Started, Ends, UserID_Seller, Description)  
-                //
-
-                w_items.write("\"" + itemID + "\"");
-                w_items.write(",\"" + name + "\"");
-                w_items.write("," + currently);
-                w_items.write("," + buyPrice);
-                w_items.write("," + firstBid);
-                w_items.write("," + numOfBids);
-                w_items.write(",\"" +  location  + "\"," + latitude + "," + longitude);
-                w_items.write(",\""  + country + "\"");       
-                w_items.write("," + startedDate);               
-                w_items.write("," + endDate);
-                w_items.write(",\""  + userID_Seller + "\"");
-                w_items.write(",\""  + description + "\"\n");
-
-
-                //
-                //  Sellers(UserID, SellerRating)
-                //
-
-                
-                w_sellers.write("\"" + userID_Seller + "\"," + "\"" + rating + "\"\n" );
-                
-
-                //
-                // Categories Table
-                // 
-                // Categories(ItemID, Category)
-                //
-                Element[] cats = getElementsByTagNameNR(item, "Category");
-                for(int c=0; c<cats.length; c++){
-                    Element cat = cats[c];
-                    String cattext = getElementText(cat).replaceAll("\"","'");
-                    w_cats.write("\"" + itemID + "\"," + "\"" +  cattext + "\"\n");
-
-                }
-
-                Element[] bids = getElementsByTagNameNR(getElementByTagNameNR(item, "Bids"), "Bid");
-                for(int b=0; b<bids.length; b++){
-                    Element bid = bids[b];
-                    
-                    //
-                    //  Bidders(UserID, BidderRating, BidderLocation, BidderCountry);
-                    //
-                    Element bidder = getElementByTagNameNR(bid, "Bidder");
-                    String userID = bidder.getAttribute("UserID").replaceAll("\"","'");
-                            //userID = userID.replace("%","%%");
-                    rating = bidder.getAttribute("Rating");
-                    String loc = getElementTextByTagNameNR(bidder, "Location").replaceAll("\"","'");
-                    String ctry = getElementTextByTagNameNR(bidder, "Country").replaceAll("\"","'");
-
-                    //System.out.println(userID);
-                    w_bidders.write("\"" + userID + "\",\"" + 
-                                            rating + "\",\"" + 
-                                            "loc" + "\",\"" + 
-                                            ctry + "\"\n");
-
-                    //
-                    //  Bids(ItemID, UserID_Bidder, Time, Amount)
-                    //
-
-                    String time = getElementTextByTagNameNR(bid, "Time");
-                    date = new SimpleDateFormat("MMM-dd-yy HH:mm:ss").parse(time);
-                    String outdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-                    String amount = getElementTextByTagNameNR(bid, "Amount");
-                    w_bids.write("\"" + itemID + "\",\"" + userID + "\",\"" + outdate + "\",\"" + strip(amount) + "\"\n");
-                }
-            }
-
-            w_items.close();
-            w_sellers.close();
-            w_bidders.close();
-            w_bids.close();
-            w_cats.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch(UnsupportedEncodingException u)
-        {
-            u.printStackTrace();
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-        }
+        
+        recursiveDescent(doc, 0);
     }
+    
+    public static void recursiveDescent(Node n, int level) {
+        // adjust indentation according to level
+        for(int i=0; i<4*level; i++)
+            System.out.print(" ");
+        
+        // dump out node name, type, and value  
+        String ntype = typeName[n.getNodeType()];
+        String nname = n.getNodeName();
+        String nvalue = n.getNodeValue();
+        
+        System.out.println("Type = " + ntype + ", Name = " + nname + ", Value = " + nvalue);
+        
+        // dump out attributes if any
+        org.w3c.dom.NamedNodeMap nattrib = n.getAttributes();
+        if(nattrib != null && nattrib.getLength() > 0)
+            for(int i=0; i<nattrib.getLength(); i++)
+                recursiveDescent(nattrib.item(i),  level+1);
+        
+        // now walk through its children list
+        org.w3c.dom.NodeList nlist = n.getChildNodes();
+        
+        for(int i=0; i<nlist.getLength(); i++)
+            recursiveDescent(nlist.item(i), level+1);
+    }  
     
     public static void main (String[] args) {
         if (args.length == 0) {
