@@ -24,9 +24,62 @@ import org.apache.lucene.util.Version;
 
 public class Indexer {
     
+    private final String indexDirectory = "/var/lib/lucene/index1/";
+    private IndexWriter indexWriter = null;
+    
     /** Creates a new instance of Indexer */
     public Indexer() {
     }
+    
+    // Taken from example Indexer in Lucene Tutorial
+    public IndexWriter getIndexWriter(boolean create) throws IOException {
+        if (indexWriter == null) {
+            Directory indexDir = FSDirectory.open(new File(indexDirectory)); // Changed Index directory to that used in project
+            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_10_2, new StandardAnalyzer());
+            indexWriter = new IndexWriter(indexDir, config);
+        }
+        return indexWriter;
+   }
+
+   // Taken from Lucene tutorial example 
+    public void closeIndexWriter() throws IOException {
+        if (indexWriter != null) {
+            indexWriter.close();
+        }
+   }
+
+   // Modified indexHotel from Example
+    public void indexItem(ResultSet items) throws IOException {
+        
+        String item_name = "";
+        String item_category = "";
+        String item_description = "";
+        
+        while(items.next()){
+            System.out.println("Indexing itemID: " + items.getString("ItemID"));
+            IndexWriter writer = getIndexWriter(false);
+            Document doc = new Document();
+            doc.add(new StringField("ItemID", items.getString("ItemID"), Field.Store.YES));
+            
+            item_name = items.getString("Name");
+            if(item_name == null)
+                item_name = "";
+            doc.add(new StringField("Name", item_name, Field.Store.YES));
+            
+            item_category = items.getString("categories");
+            if(item_category == null)
+                item_category = "";
+            
+            item_description = items.getString("Description");
+            if(item_description == null)
+                item_description = "":
+                
+            String fullSearchableText = item_category + " " + item_category + " " + item_description;
+            doc.add(new TextField("content", fullSearchableText, Field.Store.NO));
+            writer.addDocument(doc);
+        }
+    }
+
     
     public ResultSet getQueryResults(Connection con){
         
@@ -59,7 +112,8 @@ public class Indexer {
     public void rebuildIndexes() {
 
         Connection conn = null;
-
+        ResultSet queryResults;
+        
         // create a connection to the database to retrieve Items from MySQL
         try {
             conn = DbManager.getConnection(true);
@@ -87,8 +141,15 @@ public class Indexer {
         * 
         */
         
-
-
+        // Erase Existing Index  
+        getIndexWriter(true);
+        
+        // Index all Item entries
+        indexItem(getQueryResults(conn));
+        
+        // Don't Forget to close Index writer when done
+        closeIndexWriter();        
+       
         // close the database connection
         try {
             conn.close();
