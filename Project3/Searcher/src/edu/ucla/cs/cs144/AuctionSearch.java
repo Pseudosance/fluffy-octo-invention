@@ -103,7 +103,55 @@ public class AuctionSearch implements IAuctionSearch {
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {
 		// TODO: Your code here!
-		return new SearchResult[0];
+        ArrayList<SearchResult> results = new ArrayList<SearchResult>();
+        Connection con;
+        int numberValidResults = 0;
+        int skipCount = 0;
+        
+        try{
+            // Connect to DB
+            con = DBManager.getConnection(true);
+            
+            // Copying code from Tutorial 
+            // instantiate the search engine
+            SearchEngine se = new SearchEngine();
+
+            int loopCount = 0;
+            while(numberValidResults < numResultsToReturn){
+                // retrieve numResultsToReturn matching document list for the query, keep repeating this until we get number to return that are in the region
+                TopDocs topDocs = se.performSearch(query, (loopCount*numResultsToReturn) + (loopCount+1)*numResultsToReturn); 
+
+                // obtain the ScoreDoc (= documentID, relevanceScore) array from topDocs
+                ScoreDoc[] hits = topDocs.scoreDocs;
+                
+                // retrieve each matching document from the ScoreDoc arry
+                for (int i = 0; i < hits.length; i++) {
+                    Document doc = se.getDocument(hits[i].doc);
+                    
+                    // TODO: Check if item is valid (in location region)
+                    
+                    if(/* valid */){
+                        if(skipCount >= numResultsToSkip){
+                            numberValidResults++;
+                            results.add(new SearchResult(doc.get("ItemID"), doc.get("Name"));
+                        }
+                        else{
+                            skipCount++;
+                        }
+                    }
+
+                }
+                
+                loopCount++;
+            }
+            
+            // Close connection to DB
+            con.close();
+        } catch(SQLException e){
+            System.out.println(e);
+        }
+        
+		return results;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
