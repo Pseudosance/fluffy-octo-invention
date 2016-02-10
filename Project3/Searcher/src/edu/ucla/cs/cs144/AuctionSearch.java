@@ -3,6 +3,7 @@ package edu.ucla.cs.cs144;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.File;
+import java.sql.*;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -80,28 +81,35 @@ public class AuctionSearch implements IAuctionSearch {
 		// TODO: Your code here!
         ArrayList<SearchResult> results = new ArrayList<SearchResult>();
         
-        // Copying code from Tutorial 
-        // instantiate the search engine
-        SearchEngine se = new SearchEngine();
+        try{
+            // Copying code from Tutorial 
+            // instantiate the search engine
+            SearchEngine se = new SearchEngine();
 
-        // retrieve numResultsToSkip + numResultsToReturn matching document list for the query 
-        TopDocs topDocs = se.performSearch(query, numResultsToSkip+numResultsToReturn); 
+            // retrieve numResultsToSkip + numResultsToReturn matching document list for the query 
+            TopDocs topDocs = se.performSearch(query, numResultsToSkip+numResultsToReturn); 
 
-        // obtain the ScoreDoc (= documentID, relevanceScore) array from topDocs
-        ScoreDoc[] hits = topDocs.scoreDocs;
+            // obtain the ScoreDoc (= documentID, relevanceScore) array from topDocs
+            ScoreDoc[] hits = topDocs.scoreDocs;
 
-        
-        // retrieve each matching document from the ScoreDoc arry
-        for (int i = numResultsToSkip; i < hits.length; i++) {
-            Document doc = se.getDocument(hits[i].doc);
-            results.add(new SearchResult(doc.get("ItemID"), doc.get("Name"));
+            
+            // retrieve each matching document from the ScoreDoc arry
+            for (int i = numResultsToSkip; i < hits.length; i++) {
+                Document doc = se.getDocument(hits[i].doc);
+                results.add(new SearchResult(doc.get("ItemID"), doc.get("Name")));
+            }
         }
-        
-		return results;
+        catch(IOException | ParseException e){
+            System.out.println(e);
+        }
+		return results.toArray(new SearchResult[results.size()]);
 	}
+
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {
+                return new SearchResult[0];
+                
 		// TODO: Your code here!
         ArrayList<SearchResult> results = new ArrayList<SearchResult>();
         Connection con;
@@ -115,14 +123,11 @@ public class AuctionSearch implements IAuctionSearch {
                 
         try{
             // Connect to DB
-            con = DBManager.getConnection(true);
+            con = DbManager.getConnection(true);
             
             // Prepared Query For Items in location 
-            PreparedStatement locQuery = con.prepareStatement(
-                "SELECT ItemID, astext(Location) LocString
-                 FROM ItemLocations
-                 WHERE ItemID = ? AND MBRContains(" + validArea + ", Location) = 1"
-            );
+            PreparedStatement locQuery = con.prepareStatement
+            ("SELECT ItemID, astext(Location) LocString FROM ItemLocations WHERE ItemID = ? AND MBRContains(" + validArea + ", Location) = 1");
             
             // Copying code from Tutorial 
             // instantiate the search engine
@@ -147,7 +152,7 @@ public class AuctionSearch implements IAuctionSearch {
                     if(intermediaryRS.next()){
                         if(skipCount >= numResultsToSkip){
                             numberValidResults++;
-                            results.add(new SearchResult(doc.get("ItemID"), doc.get("Name"));
+                            results.add(new SearchResult(doc.get("ItemID"), doc.get("Name")));
                         }
                         else{
                             skipCount++;
@@ -161,11 +166,12 @@ public class AuctionSearch implements IAuctionSearch {
             
             // Close connection to DB
             con.close();
-        } catch(SQLException e){
+        } catch(SQLException | IOException | ParseException e){
             System.out.println(e);
         }
         
-		return results;
+		return results.toArray(new SearchResult[results.size()]);
+        
 	}
 
 	public String getXMLDataForItemId(String itemId) {

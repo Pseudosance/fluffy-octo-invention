@@ -55,58 +55,63 @@ public class Indexer {
         String item_category = "";
         String item_description = "";
         
-        while(items.next()){
-            System.out.println("Indexing itemID: " + items.getString("ItemID"));
-            IndexWriter writer = getIndexWriter(false);
-            Document doc = new Document();
-            doc.add(new StringField("ItemID", items.getString("ItemID"), Field.Store.YES));
-            
-            item_name = items.getString("Name");
-            if(item_name == null)
-                item_name = "";
-            doc.add(new StringField("Name", item_name, Field.Store.YES));
-            
-            item_category = items.getString("categories");
-            if(item_category == null)
-                item_category = "";
-            
-            item_description = items.getString("Description");
-            if(item_description == null)
-                item_description = "":
-                
-            String fullSearchableText = item_category + " " + item_category + " " + item_description;
-            doc.add(new TextField("content", fullSearchableText, Field.Store.NO));
-            writer.addDocument(doc);
-        }
+        try{
+                while(items.next()){
+                    // System.out.println("Indexing itemID: " + items.getString("ItemID"));
+                    IndexWriter writer = getIndexWriter(false);
+                    Document doc = new Document();
+                    doc.add(new StringField("ItemID", items.getString("ItemID"), Field.Store.YES));
+                    
+                    item_name = items.getString("Name");
+                    if(item_name == null)
+                        item_name = "";
+                    doc.add(new StringField("Name", item_name, Field.Store.YES));
+                    
+                    item_category = items.getString("categories");
+                    if(item_category == null)
+                        item_category = "";
+                    
+                    item_description = items.getString("Description");
+                    if(item_description == null)
+                        item_description = "";
+                        
+                    String fullSearchableText = item_name + " " + item_category + " " + item_description;
+                    doc.add(new TextField("content", fullSearchableText, Field.Store.NO));
+                    writer.addDocument(doc);
+                }
+            } catch(SQLException e){
+                 System.out.println(e);
+            }
     }
 
     
     public ResultSet getQueryResults(Connection con){
         
         Statement stmt;
-        
-        // Query to get relevant info from items
-        String itemSQL = "(SELECT ItemID, Name, Description FROM Items)";
-        
-        // Query to get all Categories per Item
-        String categorySQL = "(SELECT ItemID, GROUP_CONCAT(Category SEPARATOR ' ') categories
-                               FROM Categories
-                               GROUP BY ItemID)";
-                               
-        // Combining two queries into a single query so all data in a single ResultSet               
-        String selectSQL = "SELECT * FROM (" 
+        ResultSet res = null;
+       
+        try{
+            // Query to get relevant info from items
+            String itemSQL = "(SELECT ItemID, Name, Description FROM Items)";
+            
+            // Query to get all Categories per Item
+            String categorySQL = "(SELECT ItemID, GROUP_CONCAT(Category SEPARATOR ' ') categories FROM Categories GROUP BY ItemID)";
+                                
+            // Combining two queries into a single query so all data in a single ResultSet               
+            String selectSQL = "SELECT * FROM (" 
                                         + categorySQL + " as cats" 
                                         + " JOIN" 
                                         + itemSQL + " as items"
                                         + " ON cats.ItemID = items.ItemID" + ")"; 
-       
-        try{
+                                        
             stmt = con.createStatement();
-            return stmt.executeQuery(selectSQL);
+            res = stmt.executeQuery(selectSQL);
         }
         catch(SQLException e){
             System.out.println(e);
         }      
+        
+        return res;
     }
  
     public void rebuildIndexes() {
@@ -139,21 +144,20 @@ public class Indexer {
             * the classes become part of "edu.ucla.cs.cs144" package
             * and place your class source files at src/edu/ucla/cs/cs144/.
         * 
-        */
-        
-        // Erase Existing Index  
-        getIndexWriter(true);
-        
-        // Index all Item entries
-        indexItem(getQueryResults(conn));
-        
-        // Don't Forget to close Index writer when done
-        closeIndexWriter();        
+        */   
        
         // close the database connection
         try {
+            // Erase Existing Index  
+            getIndexWriter(true);
+            
+            // Index all Item entries
+            indexItem(getQueryResults(conn));
+            
+            // Don't Forget to close Index writer when done
+            closeIndexWriter();     
             conn.close();
-        } catch (SQLException ex) {
+        } catch (SQLException | IOException ex) {
             System.out.println(ex);
             }
     }    
