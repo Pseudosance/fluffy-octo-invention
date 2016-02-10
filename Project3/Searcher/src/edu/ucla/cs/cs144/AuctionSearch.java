@@ -107,10 +107,22 @@ public class AuctionSearch implements IAuctionSearch {
         Connection con;
         int numberValidResults = 0;
         int skipCount = 0;
+        ResultSet intermediaryRS;
         
+        // Rectangle search area for mysql query 
+        String validArea = "GeomFromText('Polygon((" + region.getLx() + " " + region.getLy() + ", " + region.getLx() + " " + region.getRy() + ", " + region.getRx() + " " + region.getRy() + ", " + region.getRx() + " " + region.getLy() + ", " + region.getLx() + " " + region.getLy() +  "))')";
+        
+                
         try{
             // Connect to DB
             con = DBManager.getConnection(true);
+            
+            // Prepared Query For Items in location 
+            PreparedStatement locQuery = con.prepareStatement(
+                "SELECT ItemID, astext(Location) LocString
+                 FROM ItemLocations
+                 WHERE ItemID = ? AND MBRContains(" + validArea + ", Location) = 1"
+            );
             
             // Copying code from Tutorial 
             // instantiate the search engine
@@ -129,8 +141,10 @@ public class AuctionSearch implements IAuctionSearch {
                     Document doc = se.getDocument(hits[i].doc);
                     
                     // TODO: Check if item is valid (in location region)
-                    
-                    if(/* valid */){
+                    locQuery.setString(1, doc.get("ItemID"));
+                    intermediaryRS = locQuery.executeQuery();
+                                        
+                    if(intermediaryRS.next()){
                         if(skipCount >= numResultsToSkip){
                             numberValidResults++;
                             results.add(new SearchResult(doc.get("ItemID"), doc.get("Name"));
