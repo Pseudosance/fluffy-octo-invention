@@ -1,3 +1,3 @@
-DROP INDEX SpatialIndex ON ItemLocations;
+DROP INDEX Location ON ItemLocations;
 
 DROP TABLE ItemLocations;
