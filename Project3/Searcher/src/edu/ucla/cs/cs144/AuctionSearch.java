@@ -186,14 +186,14 @@ public class AuctionSearch implements IAuctionSearch {
         // This gets me (BidderIDs, Times, Amounts)
         String bidsQuery = "SELECT UserID_Bidder, Time, Amount FROM Bids WHERE ItemID = " + itemId;
         // This gets me (BidderRating, BidderLoc, BidderCountry) (WILL BE A PREPARED STATEMENT)
-        String userBQuery = "SELECT BidderRating, BidderLocation, BidderCountry FROM Users WHERE UserID = ?";
+        String userBQuery = "SELECT BidderRating, BidderLocation, BidderCountry FROM Bidders WHERE UserID = ?";
         // This gets me (SellerRating) (WILL BE A PREPARED STATEMENT)
-        String userSQuery = "SELECT SellerRating FROM Users WHERE UserID = ?";
+        String userSQuery = "SELECT SellerRating FROM Sellers WHERE UserID = ?";
         // This gets me categories
         String catsQuery = "SELECT Category FROM Categories WHERE ItemID = " + itemId;
 
         // Need to get: Name, Categories, Currently, First_Bid, Number Of Bids, Bids(Bidder Rating, ID, Loc, Country, Time, Amount), Location (Lat Long + Place), Country, Started, Ends, Seller(Rating, ID), Description
-        String name, country, started, ends, description, location, sellerID, curCategory, curBidderID, curBidderLocation, curBidderCountry, started, ends, curBidTime, latitude, longitude, currently, buy_price, first_bid, number_of_bids, sellerRating, curBidderRating, curBidAmt = "";
+        String name, country, started, ends, description, location, sellerID, curCategory, curBidderID, curBidderLocation, curBidderCountry, curBidTime, latitude, longitude, currently, buy_price, first_bid, number_of_bids, sellerRating, curBidderRating, curBidAmt = "";
 
         ResultSet itemRS, bidsRS, userSellRS, userBidRS, catRS;
         Statement itemStmt, bidStmt, catStmt;
@@ -235,7 +235,7 @@ public class AuctionSearch implements IAuctionSearch {
                 }
                 
                 xmlData += "    <Currently>$" + currently + "</Currently>\n";
-                if(buy_price != null){
+                if(!buy_price.equals("0.00")){
                     xmlData += "    <Buy_Price>$" + buy_price + "</Buy_Price>\n";
                 }
                 
@@ -249,31 +249,33 @@ public class AuctionSearch implements IAuctionSearch {
                     curBidTime = bidsRS.getString("Time");
                     curBidAmt = bidsRS.getString("Amount");
                     
+                    bidsXML += "      <Bid>\n";
+                    
                     userBPrepStmt.setString(1, curBidderID);
                     userBidRS = userBPrepStmt.executeQuery();
                     if(userBidRS.next()){
                         curBidderRating = userBidRS.getString("BidderRating");
                         curBidderLocation = userBidRS.getString("BidderLocation");
                         curBidderCountry = userBidRS.getString("BidderCountry");
+                        
+                        bidsXML += "        <Bidder Rating=\"" + curBidderRating + "\" UserID=\"" + curBidderID + "\">\n";
+                        bidsXML += "          <Location>" + curBidderLocation + "</Location>\n";
+                        bidsXML += "          <Country>" + curBidderCountry + "</Country>\n";                    
+                        bidsXML += "        </Bidder>\n";                    
                     }
-                    
-                    bidsXML += "      <Bid>\n";
-                    bidsXML += "        <Bidder Rating=\"" + curBidderRating + "\" UserID=\"" + curBidderID + "\">\n";
-                    bidsXML += "          <Location>" + curBidderLocation + "</Location>\n";
-                    bidsXML += "          <Country>" + curBidderCountry + "</Country>\n";
-                    bidsXML += "        </Bidder>\n";
+                   
                     bidsXML += "        <Time>" + curBidTime + "</Time>\n";
                     bidsXML += "        <Amount>$" + curBidAmt + "</Amount>\n";
                     bidsXML += "      </Bid>\n";
                     
                 }
-                if(bidsXML = "")
+                if(bidsXML.equals(""))
                     xmlData += "    <Bids />\n";
                 else
                     xmlData += "    <Bids>\n" + bidsXML + "    </Bids>\n";
                 
                 String latLongXML = "";
-                if(latitude != null && longitude != null)
+                if(!latitude.equals("0.000000")  && !longitude.equals("0.000000"))
                     latLongXML += " Latitude=\"" + latitude + "\" Longitude=\"" + longitude + "\""; 
                 
                 xmlData += "    <Location" + latLongXML + ">" + location + "</Location>\n";
@@ -285,15 +287,20 @@ public class AuctionSearch implements IAuctionSearch {
                 userSellRS = userSPrepStmt.executeQuery();
                 if(userSellRS.next()){
                     sellerRating = userSellRS.getString("SellerRating");
+                    xmlData += "    <Seller Rating=\"" + sellerRating + "\" UserID=\"" + sellerID + "\" />\n";
                 }
-                xmlData += "    <Seller Rating=\"" + sellerRating + "\" UserID=\"" + sellerID + "\" />\n";
-                xmlData += "    <Description>" + description + "</Description>\n";
+                
+                if(description.equals(""))
+                    xmlData += "    <Description />\n";
+                else
+                    xmlData += "    <Description>" + description + "</Description>\n";
+                    
                 xmlData += "</Item>";
             }
             
             // Close connection to DB
             con.close();
-        } catch(SQLException | IOException | ParseException e){
+        } catch(SQLException e){
             System.out.println(e);
         }
         
