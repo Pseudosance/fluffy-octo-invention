@@ -108,7 +108,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {
-                return new SearchResult[0];
+                //return new SearchResult[0];
                 
 		// TODO: Your code here!
         ArrayList<SearchResult> results = new ArrayList<SearchResult>();
@@ -145,7 +145,7 @@ public class AuctionSearch implements IAuctionSearch {
                 for (int i = 0; i < hits.length; i++) {
                     Document doc = se.getDocument(hits[i].doc);
                     
-                    // TODO: Check if item is valid (in location region)
+                    // Check if item is valid (in location region)
                     locQuery.setString(1, doc.get("ItemID"));
                     intermediaryRS = locQuery.executeQuery();
                                         
@@ -176,7 +176,128 @@ public class AuctionSearch implements IAuctionSearch {
 
 	public String getXMLDataForItemId(String itemId) {
 		// TODO: Your code here!
-		return "";
+        Connection con;
+        
+        // This is the returned XML 
+        String xmlData = "";
+        
+        // this gets me (Name, Currently, BuyPrice, FirstBid, #Bids, ItemLoc, Lat, Long, Country, Started, Ends, SellerID, Descr )
+        String itemsQuery = "SELECT * FROM Items WHERE ItemID = " + itemId;
+        // This gets me (BidderIDs, Times, Amounts)
+        String bidsQuery = "SELECT UserID_Bidder, Time, Amount FROM Bids WHERE ItemID = " + itemId;
+        // This gets me (BidderRating, BidderLoc, BidderCountry) (WILL BE A PREPARED STATEMENT)
+        String userBQuery = "SELECT BidderRating, BidderLocation, BidderCountry FROM Users WHERE UserID = ?";
+        // This gets me (SellerRating) (WILL BE A PREPARED STATEMENT)
+        String userSQuery = "SELECT SellerRating FROM Users WHERE UserID = ?";
+        // This gets me categories
+        String catsQuery = "SELECT Category FROM Categories WHERE ItemID = " + itemId;
+
+        // Need to get: Name, Categories, Currently, First_Bid, Number Of Bids, Bids(Bidder Rating, ID, Loc, Country, Time, Amount), Location (Lat Long + Place), Country, Started, Ends, Seller(Rating, ID), Description
+        String name, country, started, ends, description, location, sellerID, curCategory, curBidderID, curBidderLocation, curBidderCountry, started, ends, curBidTime, latitude, longitude, currently, buy_price, first_bid, number_of_bids, sellerRating, curBidderRating, curBidAmt = "";
+
+        ResultSet itemRS, bidsRS, userSellRS, userBidRS, catRS;
+        Statement itemStmt, bidStmt, catStmt;
+        
+        try{
+            // Connect to DB
+            con = DbManager.getConnection(true);
+            itemStmt = con.createStatement();
+            bidStmt = con.createStatement();
+            catStmt = con.createStatement();
+            // Prepared Query For Items in location 
+            PreparedStatement userBPrepStmt = con.prepareStatement(userBQuery);
+            // Prepared Query For Items in location 
+            PreparedStatement userSPrepStmt = con.prepareStatement(userSQuery);
+            
+            itemRS = itemStmt.executeQuery(itemsQuery);
+            if(itemRS.next()){
+                name = itemRS.getString("Name");
+                currently = itemRS.getString("Currently");
+                buy_price = itemRS.getString("BuyPrice");
+                first_bid = itemRS.getString("FirstBid");
+                number_of_bids = itemRS.getString("NumberOfBids");
+                location = itemRS.getString("ItemLocation");
+                latitude = itemRS.getString("ItemLatitude");
+                longitude = itemRS.getString("ItemLongitude");
+                country = itemRS.getString("ItemCountry");
+                started = itemRS.getString("Started");
+                ends = itemRS.getString("Ends");
+                sellerID = itemRS.getString("UserID_Seller");
+                description = itemRS.getString("Description");
+                
+                xmlData = "<Item ItemID=\"" + itemId + "\">\n";
+                xmlData += "    <Name>" + name + "</Name>\n";
+                
+                catRS = catStmt.executeQuery(catsQuery);
+                while(catRS.next()){
+                    curCategory = catRS.getString("Category");
+                    xmlData += "    <Category>" + curCategory + "</Category>\n";
+                }
+                
+                xmlData += "    <Currently>$" + currently + "</Currently>\n";
+                if(buy_price != null){
+                    xmlData += "    <Buy_Price>$" + buy_price + "</Buy_Price>\n";
+                }
+                
+                xmlData += "    <First_Bid>$" + first_bid + "</First_Bid>\n";
+                xmlData += "    <Number_of_Bids>" + number_of_bids + "</Number_of_Bids>\n";
+                
+                bidsRS = bidStmt.executeQuery(bidsQuery);
+                String bidsXML = "";
+                while(bidsRS.next()){
+                    curBidderID = bidsRS.getString("UserID_Bidder");
+                    curBidTime = bidsRS.getString("Time");
+                    curBidAmt = bidsRS.getString("Amount");
+                    
+                    userBPrepStmt.setString(1, curBidderID);
+                    userBidRS = userBPrepStmt.executeQuery();
+                    if(userBidRS.next()){
+                        curBidderRating = userBidRS.getString("BidderRating");
+                        curBidderLocation = userBidRS.getString("BidderLocation");
+                        curBidderCountry = userBidRS.getString("BidderCountry");
+                    }
+                    
+                    bidsXML += "      <Bid>\n";
+                    bidsXML += "        <Bidder Rating=\"" + curBidderRating + "\" UserID=\"" + curBidderID + "\">\n";
+                    bidsXML += "          <Location>" + curBidderLocation + "</Location>\n";
+                    bidsXML += "          <Country>" + curBidderCountry + "</Country>\n";
+                    bidsXML += "        </Bidder>\n";
+                    bidsXML += "        <Time>" + curBidTime + "</Time>\n";
+                    bidsXML += "        <Amount>$" + curBidAmt + "</Amount>\n";
+                    bidsXML += "      </Bid>\n";
+                    
+                }
+                if(bidsXML = "")
+                    xmlData += "    <Bids />\n";
+                else
+                    xmlData += "    <Bids>\n" + bidsXML + "    </Bids>\n";
+                
+                String latLongXML = "";
+                if(latitude != null && longitude != null)
+                    latLongXML += " Latitude=\"" + latitude + "\" Longitude=\"" + longitude + "\""; 
+                
+                xmlData += "    <Location" + latLongXML + ">" + location + "</Location>\n";
+                xmlData += "    <Country>" + country + "</Country>\n";
+                xmlData += "    <Started>" + started + "</Started>\n";
+                xmlData += "    <Ends>" + ends + "</Ends>\n";
+                
+                userSPrepStmt.setString(1, sellerID);
+                userSellRS = userSPrepStmt.executeQuery();
+                if(userSellRS.next()){
+                    sellerRating = userSellRS.getString("SellerRating");
+                }
+                xmlData += "    <Seller Rating=\"" + sellerRating + "\" UserID=\"" + sellerID + "\" />\n";
+                xmlData += "    <Description>" + description + "</Description>\n";
+                xmlData += "</Item>";
+            }
+            
+            // Close connection to DB
+            con.close();
+        } catch(SQLException | IOException | ParseException e){
+            System.out.println(e);
+        }
+        
+		return xmlData;
 	}
 	
 	public String echo(String message) {
