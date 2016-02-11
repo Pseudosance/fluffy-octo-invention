@@ -85,16 +85,23 @@ public class AuctionSearch implements IAuctionSearch {
             // Copying code from Tutorial 
             // instantiate the search engine
             SearchEngine se = new SearchEngine();
-
+            
+            int x = numResultsToReturn+numResultsToSkip;
+            
             // retrieve numResultsToSkip + numResultsToReturn matching document list for the query 
-            TopDocs topDocs = se.performSearch(query, numResultsToSkip+numResultsToReturn); 
+            TopDocs topDocs = se.performSearch(query, x); 
 
             // obtain the ScoreDoc (= documentID, relevanceScore) array from topDocs
             ScoreDoc[] hits = topDocs.scoreDocs;
 
+            //System.out.println("basicSearch Hits array size: " + hits.length);
+            //System.out.println("hits should be size: " + x);
             
             // retrieve each matching document from the ScoreDoc arry
             for (int i = numResultsToSkip; i < hits.length; i++) {
+                
+                //System.out.println("BasicSearch ForLoop i = " + i);
+                
                 Document doc = se.getDocument(hits[i].doc);
                 results.add(new SearchResult(doc.get("ItemID"), doc.get("Name")));
             }
@@ -102,6 +109,9 @@ public class AuctionSearch implements IAuctionSearch {
         catch(IOException | ParseException e){
             System.out.println(e);
         }
+        
+        //System.out.println("Basic Search is returning hits = " + results.size());
+        
 		return results.toArray(new SearchResult[results.size()]);
 	}
 
@@ -133,37 +143,68 @@ public class AuctionSearch implements IAuctionSearch {
             // instantiate the search engine
             SearchEngine se = new SearchEngine();
 
-            int loopCount = 0;
-            while(numberValidResults < numResultsToReturn){
+            //int loopCount = 0;
+            //while(numberValidResults < numResultsToReturn){
+                
+                //System.out.println("Loop count: " + loopCount);
+                //System.out.println("Number of results in region so far: " + numberValidResults);
+                
                 // retrieve numResultsToReturn matching document list for the query, keep repeating this until we get number to return that are in the region
-                TopDocs topDocs = se.performSearch(query, (loopCount*numResultsToReturn) + (loopCount+1)*numResultsToReturn); 
+                //TopDocs topDocs = se.performSearch(query,  (loopCount+1)*numResultsToReturn); 
+
+            TopDocs topDocs = se.performSearch(query, Integer.MAX_VALUE);
 
                 // obtain the ScoreDoc (= documentID, relevanceScore) array from topDocs
                 ScoreDoc[] hits = topDocs.scoreDocs;
+                
+                //int toSkip = loopCount*numResultsToReturn;
+                //int toRet = (loopCount+1)*numResultsToReturn;
+                
+                //System.out.println("toSkip = " + toSkip);
+                
+                //SearchResult[] hits = basicSearch(query, toSkip, numResultsToReturn);
+                
+                //System.out.println(hits.length);
                 
                 // retrieve each matching document from the ScoreDoc arry
                 for (int i = 0; i < hits.length; i++) {
                     Document doc = se.getDocument(hits[i].doc);
                     
+                    //System.out.println("For loop, i = " + i);
+                    
                     // Check if item is valid (in location region)
+                    //locQuery.setString(1, hits[i].getItemId());
                     locQuery.setString(1, doc.get("ItemID"));
                     intermediaryRS = locQuery.executeQuery();
                                         
                     if(intermediaryRS.next()){
-                        if(skipCount >= numResultsToSkip){
+                        
+                        //System.out.println("Skip Count: " + skipCount + ", out of: " + numResultsToSkip);
+                        
+                        if(skipCount >= numResultsToSkip && numberValidResults < numResultsToReturn){
+                            
+                            //System.out.println("Passed the skip number, which means this one is returned");
+                            
                             numberValidResults++;
+                            
+                            //System.out.println("Number Valid: " + numberValidResults);
                             results.add(new SearchResult(doc.get("ItemID"), doc.get("Name")));
+
+                            //results.add(new SearchResult(hits[i].getItemId(), hits[i].getName()));
                         }
                         else{
                             skipCount++;
                         }
                     }
+                    
+                    //intermediaryRS.close();
 
                 }
                 
-                loopCount++;
-            }
+               // loopCount++;
+            //}
             
+            //locQuery.close();
             // Close connection to DB
             con.close();
         } catch(SQLException | IOException | ParseException e){
