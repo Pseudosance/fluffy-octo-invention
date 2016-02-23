@@ -20,7 +20,22 @@
 	  	<input type="text" name="id">
 	  	<input type="submit" value="Search">
 	</form>
-  	Item: <br />
-  	<%= request.getAttribute("ItemInfo") %>
+  	ItemID: <%= request.getAttribute("ItemId") %> <br />
+    Name: <%= request.getAttribute("Name") %> <br />
+    Currently: <%= request.getAttribute("Currently") %> <br />
+    Buy Price: <%= request.getAttribute("BuyPrice") %> <br />
+    First Bid: <%= request.getAttribute("FirstBid") %> <br />
+    Number of Bids: <%= request.getAttribute("NumOfBids") %> <br />
+    Latitude: <%= request.getAttribute("Latitude") %> <br />
+    Longitude: <%= request.getAttribute("Longitude") %> <br />
+    Country: <%= request.getAttribute("Country") %> <br />
+    Started: <%= request.getAttribute("Started") %> <br />
+    Ends: <%= request.getAttribute("Ends") %> <br />
+    Seller: <%= request.getAttribute("Seller") %> <br />
+    Rating: <%= request.getAttribute("Rating") %> <br />
+    Description: <%= request.getAttribute("Description") %> <br /><br />
+
+    <%= request.getAttribute("ItemInfo") %>
+
 </body>
 </html>
