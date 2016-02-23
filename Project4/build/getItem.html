@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Keyword Search</title>
+  <title>Get Item</title>
   <meta name="description" content="UCLA CS144 Winter 2016">
   <meta name="author" content="Mitchell Binning, Erick Ruiz">
 
@@ -15,14 +15,11 @@
 </head>
 
 <body>
-  <form action="/eBay/search">
-  	Search:
-  	<input type="text" name="q">
-  	<input type="submit" value="Search">
-    <input type="hidden" name="numResultsToSkip" value="0">
-    <input type="hidden" name="numResultsToReturn" value="100">
-  </form>
-  Response: <%= request.getAttribute("result") %>
-  Echo: <%= request.getAttribute("reply") %>
+	<form action="/eBay/item">
+	  	Search:
+	  	<input type="text" name="id">
+	  	<input type="submit" value="Search">
+	</form>
+ 	No Item Selected!
 </body>
 </html>

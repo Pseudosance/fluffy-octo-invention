@@ -20,7 +20,7 @@
   	<input type="text" name="q">
   	<input type="submit" value="Search">
     <input type="hidden" name="numResultsToSkip" value="0">
-    <input type="hidden" name="numResultsToReturn" value="0">
+    <input type="hidden" name="numResultsToReturn" value="100">
   </form>
   Response: <%= request.getAttribute("result") %>
   Echo: <%= request.getAttribute("reply") %>

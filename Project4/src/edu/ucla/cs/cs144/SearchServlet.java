@@ -42,11 +42,11 @@ public class SearchServlet extends HttpServlet implements Servlet {
         SearchResult[] searchResults = AuctionSearchClient.basicSearch(q, numResultsToSkip, numResultsToReturn);
         String reply = AuctionSearchClient.echo("ECHOOOO");
 
-        results = q + "(" + param1 + "," + param2 + "):\n";
+        results = q + "(" + param1 + "," + param2 + "):<br />";
 
         for(SearchResult result : searchResults) 
         {
-            results += result.getItemId() + " " + result.getName() + "\n";
+            results += result.getItemId() + " " + result.getName() + "<br />";
         }
 
         request.setAttribute("result", results);
