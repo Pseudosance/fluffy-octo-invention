@@ -1,9 +1,11 @@
 <!doctype html>
+<%@ page import="edu.ucla.cs.cs144.ItemServlet.Item" %>
+<%@ page import="edu.ucla.cs.cs144.ItemServlet.Item.Bid" %>
 <html lang="en">
 <head>
   <meta charset="utf-8">
 
-  <title>Get Item <%= request.getAttribute("ItemId") %></title>
+  <title>Item: <%= request.getAttribute("ItemId") %></title>
   <meta name="description" content="UCLA CS144 Winter 2016">
   <meta name="author" content="Mitchell Binning, Erick Ruiz">
 
@@ -15,27 +17,28 @@
 </head>
 
 <body>
-	<form action="/eBay/item">
-	  	Search:
-	  	<input type="text" name="id">
-	  	<input type="submit" value="Search">
-	</form>
-  	ItemID: <%= request.getAttribute("ItemId") %> <br />
-    Name: <%= request.getAttribute("Name") %> <br />
-    Currently: <%= request.getAttribute("Currently") %> <br />
-    Buy Price: <%= request.getAttribute("BuyPrice") %> <br />
-    First Bid: <%= request.getAttribute("FirstBid") %> <br />
-    Number of Bids: <%= request.getAttribute("NumOfBids") %> <br />
-    Latitude: <%= request.getAttribute("Latitude") %> <br />
-    Longitude: <%= request.getAttribute("Longitude") %> <br />
-    Country: <%= request.getAttribute("Country") %> <br />
-    Started: <%= request.getAttribute("Started") %> <br />
-    Ends: <%= request.getAttribute("Ends") %> <br />
-    Seller: <%= request.getAttribute("Seller") %> <br />
-    Rating: <%= request.getAttribute("Rating") %> <br />
-    Description: <%= request.getAttribute("Description") %> <br /><br />
 
-    <%= request.getAttribute("ItemInfo") %>
+
+    <%
+      Item details = (Item) request.getAttribute("itemdetails");
+    %>
+    <br /> <br />
+
+  	ItemID: <%= request.getAttribute("ItemId") %> <br />
+    Name: <%= details.Name %> <br />
+    Currently: <%= details.Currently %> <br />
+    Buy Price: <%= details.BuyPrice  %><br />
+    First Bid: <%= details.FirstBid %><br />
+    Number of Bids: <%= details.NumberOfBids %> <br />
+    Latitude: <%= details.Latitude %> <br />
+    Longitude: <%= details.Longitude %> <br />
+    Location: <%= details.Location %> <br />
+    Country: <%= details.Country %> <br />
+    Started: <%= details.Started %> <br />
+    Ends: <%= details.Ends %> <br />
+    Seller: <%= details.SellerID %> <br />
+    Rating: <%= details.SellerRating %> <br />
+    Description: <%= details.Description %> <br /><br />
 
 </body>
 </html>
