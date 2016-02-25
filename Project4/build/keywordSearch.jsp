@@ -35,5 +35,38 @@
     <input type="hidden" name="numResultsToReturn" value="20">
   </form>
     <%= request.getAttribute("result") %>
+    <br />
+
+    <%
+      String skipString = request.getParameter("numResultsToSkip");
+      String numRetString = request.getParameter("numResultsToReturn");
+      String q = request.getParameter("q");
+      int numRet = 0;
+      int skip = 0;;
+
+      if(skipString != null && numRetString != null)
+      {
+        numRet = Integer.parseInt(numRetString);
+        skip = Integer.parseInt(skipString);
+
+        if(skip != 0)
+        {
+          out.print("<a href=\"search?q="+q+"&numResultsToSkip="+Integer.toString(skip-20)+"&numResultsToReturn="+Integer.toString(numRet)+"\" > Prev Results </a>");
+        }
+
+      }
+      
+      
+    
+    %>
+    <%
+      if(q != null)
+      {
+        out.print("<a href=\"search?q="+q+"&numResultsToSkip="+Integer.toString(skip+20)+
+                        "&numResultsToReturn="+Integer.toString(numRet)+"\" > Next Results </a>");  
+      }
+      
+    %>
+    
 </body>
 </html>

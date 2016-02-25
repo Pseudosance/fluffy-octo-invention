@@ -113,6 +113,17 @@
     </form>
 
     <br /> <br />
+    <%
+      String param1 = request.getParameter("numResultsToReturn");
+      String param2 = request.getParameter("numResultsToSkip");
+      String q = request.getParameter("q");
+
+      if(q != null && param1  != null && param2 != null)
+      {
+        out.print("<a href=\"search?q="+q+"&numResultsToSkip="+param2+"&numResultsToReturn="+
+                      param1+"\"> Back to Search Results </a>");
+      }
+    %>
     <table>
       <tr>
         <td>

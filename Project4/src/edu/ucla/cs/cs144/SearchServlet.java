@@ -44,7 +44,8 @@ public class SearchServlet extends HttpServlet implements Servlet {
 
         for(SearchResult result : searchResults) 
         {
-            results += "<a href=\"item?id="+result.getItemId()+"\">"+ result.getItemId()+"</a>" + " " + result.getName() + "<br />";
+            results += "<a href=\"item?id="+result.getItemId()+"&q="+q+"&numResultsToSkip="+
+                        param1+"&numResultsToReturn="+param2+"\">"+ result.getItemId()+"</a>" + " " + result.getName() + "<br />";
         }
 
         request.setAttribute("result", results);
