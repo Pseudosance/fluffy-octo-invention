@@ -78,6 +78,13 @@
     
 <body onload="initialize()">
 
+    <a href="search">Search</a>
+    <form action="/eBay/item">
+    Get Item:
+      <input type="text" name="id">
+      <input type="submit" value="Go">
+    </form>
+
     <br /> <br />
     <table>
       <tr>
@@ -201,6 +208,25 @@
 
     <br /> <br />
 
+    <table>
+      <tr>
+        <td>
+          Categories
+        </td>
+        <td>
+        </td>
+      </tr>
+        <% 
+            if(details.Categories != null)
+            {
+              for(int i=0; i<details.Categories.size(); i++)
+              {
+                out.println("<tr><td></td><td>"+details.Categories.get(i)+"</td></tr>");
+              }
+            }
+        %>
+    </table>
+
     <table width="50%">
       <tr>
         <td>
@@ -219,6 +245,45 @@
       </tr>
     </table>
 
+    <br /> <br />
+
+    <table>
+      <tr>
+        <td>
+          Bids
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+
+      </tr>
+      <tr>
+        <td></td>
+        <td>Bid ID</td>
+        <td>Amount</td>
+        <td>Time</td>
+        <td>Rating</td>
+        <td>Location</td>
+        <td>Country</td>
+      </tr>
+      <% 
+        if(details.Bids != null)
+        {
+          for(int i=0; i < details.Bids.size(); i++)
+          {
+
+            out.println("<tr><td></td><td>"+details.Bids.get(i).BidID+"</td>"+"<td>"+details.Bids.get(i).BidAmount+"</td>"+
+                        "<td>"+details.Bids.get(i).BidTime+"</td>"+"<td>"+details.Bids.get(i).BidRating+"</td>"+
+                        "<td>"+details.Bids.get(i).BidLocation+"</td>"+"<td>"+details.Bids.get(i).BidCountry+"</td></tr>");
+          }
+        }
+      %>
+    </table>
+
+    <br /> <br />
     <div id="map_canvas" style="width: 600px; height: 400px"></div>
 
 </body>

@@ -15,14 +15,14 @@
 </head>
 
 <body>
+  <a href="item">Item Search</a>
   <form action="/eBay/search">
   	Search:
   	<input type="text" name="q">
   	<input type="submit" value="Search">
     <input type="hidden" name="numResultsToSkip" value="0">
-    <input type="hidden" name="numResultsToReturn" value="100">
+    <input type="hidden" name="numResultsToReturn" value="20">
   </form>
-  Response: <%= request.getAttribute("result") %>
-  Echo: <%= request.getAttribute("reply") %>
+    <%= request.getAttribute("result") %>
 </body>
 </html>
