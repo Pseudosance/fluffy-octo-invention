@@ -12,6 +12,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.net.HttpURLConnection;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+
 public class ProxyServlet extends HttpServlet implements Servlet {
        
     public ProxyServlet() {}
@@ -35,27 +39,27 @@ public class ProxyServlet extends HttpServlet implements Servlet {
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept-Charset", enc);
         int responseCode = con.getResponseCode();
-        //System.out.println("GET Response Code :: " + responseCode);
+            //System.out.println("GET Response Code :: " + responseCode);
         if (responseCode == HttpURLConnection.HTTP_OK) { // success
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     con.getInputStream()));
             String inputLine;
-            StringBuffer response = new StringBuffer();
+            StringBuffer responseB = new StringBuffer();
  
             while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                responseB.append(inputLine);
             }
             in.close();
  
             // print result
-            //System.out.println(response.toString());
+                //System.out.println(responseB.toString());
             
             // If you intend to use responseXML to access Google suggest responses as an XML DOM, make sure that your proxy sets the "Content-Type:" HTTP header field to "text/xml" in its response
             response.setContentType("text/xml");
             
             // returns the results back to the original caller
                 // return the exact XML data received from Google
-            response.getWriter().write(response.toString());
+            response.getWriter().write(responseB.toString());
             
         } else {
             System.out.println("GET request not worked");

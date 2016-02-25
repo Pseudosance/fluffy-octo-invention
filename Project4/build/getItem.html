@@ -12,12 +12,23 @@
   <!--[if lt IE 9]>
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
+  
+  <!-- Auto Suggest stuff --><!--
+    <script type="text/javascript" src="suggestions.js"></script>
+    <script type="text/javascript" src="autosuggest.js"></script>
+    <link rel="stylesheet" type="text/css" href="autosuggest.css" />
+    <script type="text/javascript">
+      window.onload=function(){
+        var oTextbox = new AutoSuggestControl(document.getElementById("qt"), new StateSuggestions());
+      }
+    </script>
+    -->
 </head>
 
 <body>
 	<form action="/eBay/item">
 	  	Search:
-	  	<input type="text" name="id">
+	  	<input type="text" name="id" id="qt">
 	  	<input type="submit" value="Search">
 	</form>
  	No Item Selected!

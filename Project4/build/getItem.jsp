@@ -21,23 +21,16 @@
         
         var geocoder;        // Straight outa google documentation
         var map;
+        var latlng;
         
         function initialize() { 
+
             geocoder = new google.maps.Geocoder(); // google documentation
-            
-            var lat = "<%=details.Latitude%>";
-            var long = "<%=details.Longitude%>";
-            var latlng;
-            var zoomDist = 1;
-            if(lat != "" && long != ""){
-                latlng = new google.maps.LatLng(lat, long);
-                zoomDist = 14;
-            }
-            else
-                latlng = new google.maps.LatLng(34.063509,-118.44541); 
+
+            latlng = new google.maps.LatLng(34.063509,-118.44541); 
             
             var myOptions = { 
-                zoom: zoomDist, // default is 8  
+                zoom: 1, // default is 8  
                 center: latlng, 
                 mapTypeId: google.maps.MapTypeId.ROADMAP 
             }; 
@@ -45,26 +38,49 @@
             map = new google.maps.Map(document.getElementById("map_canvas"),
                 myOptions); 
                 
-            if(zoomDist != 14 && address != "")
-                codeAddress();
+            codeAddress();
         } 
     
         // Google documentation
         function codeAddress() {
-            var address = "<%=address%>";
-            geocoder.geocode( { 'address': address}, function(results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
-                map.setCenter(results[0].geometry.location);
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location
-                });
-            } else {
-                alert("Geocode was not successful for the following reason: " + status);
-            }
-            });
-        }
+            var lat = "<%=details.Latitude%>";
+            var long = "<%=details.Longitude%>";
 
+            if(lat != "" && long != ""){
+                latlng = new google.maps.LatLng(lat, long);
+                map.setZoom(14);
+                map.setCenter(latlng);
+                var marker = new google.maps.Marker({
+                                map: map,
+                                position: latlng
+                            });
+            }
+            else{
+                var add = "<%= details.Location %>";
+			    var country = "<%= details.Country %>";
+			    add = add + ", " + country;
+                if(add != ""){
+                    geocoder.geocode( { 'address': add}, function(results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            map.setZoom(14);
+                            map.setCenter(results[0].geometry.location);
+                            var marker = new google.maps.Marker({
+                                map: map,
+                                position: results[0].geometry.location
+                            });
+                        } else {
+                            //alert("Geocode was not successful for the following reason: " + status);
+                        }
+                    });
+                }
+                else{
+                    
+                }
+            }
+           
+        }
+        
+      google.maps.event.addDomListener(window, 'load', initialize);
     </script> 
 
   <!--<link rel="stylesheet" href="css/styles.css?v=1.0"> -->
@@ -72,17 +88,28 @@
   <!--[if lt IE 9]>
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
+  
+    <!-- Auto Suggest stuff -->
+    <script type="text/javascript" src="suggestions.js"></script>
+    <script type="text/javascript" src="autosuggest.js"></script>
+    <link rel="stylesheet" type="text/css" href="autosuggest.css" />
+    <script type="text/javascript">
+      window.onload=function(){
+        var oTextbox = new AutoSuggestControl(document.getElementById("qt"), new StateSuggestions());
+      }
+    </script>
+    
 </head>
 
 
     
-<body onload="initialize()">
+<body >
 
     <a href="search">Search</a>
     <form action="/eBay/item">
     Get Item:
-      <input type="text" name="id">
-      <input type="submit" value="Go">
+      <input type="text" name="id" id="qt">
+      <input type="submit" value="Go" onclick="codeAddress()">
     </form>
 
     <br /> <br />

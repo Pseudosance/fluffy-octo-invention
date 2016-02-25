@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>Autosuggest Example 1</title>
+        <script type="text/javascript" src="autosuggest1.js"></script>
+        <script type="text/javascript" src="suggestions1.js"></script>
+        <script type="text/javascript">
+            window.onload = function () {
+                var oTextbox = new AutoSuggestControl(document.getElementById("txt1"), new StateSuggestions());        
+            }
+        </script>
+
+    </head>
+    <body>
+        <p>This first example simply shows the &quot;type ahead&quot; functionality.
+        Type ahead involves placing a single suggestion into the textbox as the user types.
+        Only the part that the user didn't type is selected so that the user can
+        continue to type and get appropriate suggestions.</p>
+        <p>Type a state name into the textbox below. Make sure the state name begins
+        with a capital letter. The best example is to type &quot;Missouri&quot; one
+        letter at a time. You will get suggestions of &quot;Maine&quot;, &quot;Michigan&quot;,
+        &quot;Mississippi&quot;, and then finally &quot;Missouri&quot;.</p>
+        <p>Try it for yourself:</p>
+        <p><input type="text" id="txt1" /></p>
+    </body>
+</html>
