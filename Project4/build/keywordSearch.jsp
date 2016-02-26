@@ -27,6 +27,7 @@
 
 <body>
   <a href="item">Item Search</a>
+  <br /> <br />
   <form action="/eBay/search">
   	Search:
   	<input type="text" name="q" id="qt">
@@ -34,6 +35,7 @@
     <input type="hidden" name="numResultsToSkip" value="0">
     <input type="hidden" name="numResultsToReturn" value="20">
   </form>
+  <br /><br />
     <%= request.getAttribute("result") %>
     <br />
 

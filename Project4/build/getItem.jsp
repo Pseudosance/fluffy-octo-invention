@@ -7,7 +7,11 @@
 <head>
   <meta charset="utf-8">
  
-  <title>Item: <%= request.getAttribute("ItemId") %></title>
+  <title><% if(request.getAttribute("ItemId") != null)
+                    out.print("Item: "+request.getParameter("id"));
+                  else
+                    out.print("Item Search");
+                     %></title>
   <meta name="description" content="UCLA CS144 Winter 2016">
   <meta name="author" content="Mitchell Binning, Erick Ruiz">
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
@@ -106,12 +110,16 @@
 <body >
 
     <a href="search">Search</a>
+    <br /> <br />
     <form action="/eBay/item">
     Get Item:
       <input type="text" name="id" id="qt">
       <input type="submit" value="Go" onclick="codeAddress()">
     </form>
-
+<% if(details != null && details.ItemID == "" && request.getParameter("id") != null) { %>
+    <br /> <br />
+    Cannot find item <%= request.getParameter("id") %> !
+<% } else if(request.getParameter("id") != null) { %>
     <br /> <br />
     <%
       String param1 = request.getParameter("numResultsToReturn");
@@ -121,7 +129,7 @@
       if(q != null && param1  != null && param2 != null)
       {
         out.print("<a href=\"search?q="+q+"&numResultsToSkip="+param2+"&numResultsToReturn="+
-                      param1+"\"> Back to Search Results </a>");
+                      param1+"\"> Back to Search Results </a><br /><br />");
       }
     %>
     <table>
@@ -323,6 +331,6 @@
 
     <br /> <br />
     <div id="map_canvas" style="width: 600px; height: 400px"></div>
-
+<% } %>
 </body>
 </html>
