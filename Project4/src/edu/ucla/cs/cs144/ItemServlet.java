@@ -159,7 +159,7 @@ public class ItemServlet extends HttpServlet implements Servlet {
                     String BidTime = getElementTextByTagNameNR(elements[i], "Time");
                     String BidAmount = getElementTextByTagNameNR(elements[i], "Amount");
                     Bid new_bid = new Bid(BidderRating, BidderID, BidderLocation, BidderCountry, BidTime, BidAmount);
-                    this.Bids.add(new_bid);
+                    this.Bids.add(0,new_bid);
                 }
             }
         }
