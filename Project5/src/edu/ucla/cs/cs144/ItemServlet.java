@@ -167,6 +167,10 @@ public class ItemServlet extends HttpServlet implements Servlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+        
+        // Project 5, Make session so we do not have contact oak server to get item data again and to prevent user from changing buy price.
+        HttpSession session = request.getSession(true);
+        
     	PrintWriter out = response.getWriter();
         String id = request.getParameter("id");
         String result = "";
@@ -176,6 +180,9 @@ public class ItemServlet extends HttpServlet implements Servlet {
         	result = AuctionSearchClient.getXMLDataForItemId(id);
         	//request.setAttribute("ItemInfo", result);
         	request.setAttribute("ItemId", id);
+            
+            //Store ItemID in session
+            session.setAttribute("ItemId", id);
         }
 
         if(result != "")
@@ -241,6 +248,10 @@ public class ItemServlet extends HttpServlet implements Servlet {
                     BidElements);
 
             request.setAttribute("itemdetails", myitem);
+            
+            // Store Item Name, Buy_Price in session
+            session.setAttribute("name", name);
+            session.setAttribute("buyPrice", buyPrice);
         }
         else {
             String str = "";
