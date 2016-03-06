@@ -207,7 +207,7 @@ class MyParser {
                 String itemID = item.getAttribute("ItemID");
                 String name = getElementTextByTagNameNR(item, "Name").replaceAll("\"","'");
                 String currently = strip(getElementTextByTagNameNR(item, "Currently"));
-                String buyPrice = strip(getElementTextByTagNameNR(item, "BuyPrice"));
+                String buyPrice = strip(getElementTextByTagNameNR(item, "Buy_Price"));
                 String firstBid = strip(getElementTextByTagNameNR(item, "First_Bid"));
                 String numOfBids = getElementTextByTagNameNR(item, "Number_of_Bids");
                 String latitude = getElementByTagNameNR(item, "Location").getAttribute("Latitude");

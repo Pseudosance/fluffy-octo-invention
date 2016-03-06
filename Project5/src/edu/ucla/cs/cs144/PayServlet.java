@@ -22,7 +22,6 @@ public class PayServlet extends HttpServlet implements Servlet {
         
         if(ItemId == null){
                 // There is no session, which means someone went directly to the URL without having clicked on an item yet...
-                // TODO: Handle case with nada....   
         }
         //else{
            
