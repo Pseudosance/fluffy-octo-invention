@@ -23,6 +23,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.ErrorHandler;
 
+import javax.servlet.http.HttpSession;
+
 public class ItemServlet extends HttpServlet implements Servlet {
        
     public ItemServlet() {}

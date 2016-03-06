@@ -164,18 +164,13 @@
         <td>
           <%= details.BuyPrice %>
         </td>
-        <% if(details.BuyPrice != ""){
-               out.print("<td>");
-                  out.print("
-                            <form action="/eBay/pay">
-                                <input type="submit" value="Pay Now">
-                            </form>
-                                ");
-               out.print("</td>");
-           }
-           else{
-                    out.print("Item Search");
-           }
+        <% if(details.BuyPrice != ""){ %>
+             <td>
+                <form action="/eBay/pay">
+                    <input type="submit" value="Pay Now">
+                </form>
+             </td>
+          <% } 
          %>
       </tr>
       <tr>
